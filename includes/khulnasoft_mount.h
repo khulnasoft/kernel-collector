@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#ifndef _KHULNASOFT_MOUNT_H_
+#define _KHULNASOFT_MOUNT_H_ 1
+
+enum mount_counters {
+    KHULNASOFT_KEY_MOUNT_CALL,
+    KHULNASOFT_KEY_UMOUNT_CALL,
+    KHULNASOFT_KEY_MOUNT_ERROR,
+    KHULNASOFT_KEY_UMOUNT_ERROR,
+
+    KHULNASOFT_MOUNT_END
+};
+
+#endif /* _KHULNASOFT_MOUNT_H_ */
+

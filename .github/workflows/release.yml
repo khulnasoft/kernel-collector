@@ -1,0 +1,111 @@
+---
+# Builds and Releases packages for eBPF to be consumed by Khulnasoft Agent
+name: CD
+on:
+  push:
+    tags:
+      - 'v*'
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-artifacts:
+    name: Build Artifacts
+    strategy:
+      matrix:
+        kernel_version:
+          - '6.8.2'
+          - '5.16.18'
+          - '5.15.63'
+          - '5.14.0'
+          - '5.11.19'
+          - '5.10.139'
+          - '5.4.210'
+          - '5.4.17'
+          - '4.16.18'
+          - '4.18.0'
+          - '4.14.291'
+        libc:
+          - static
+          - glibc
+          - musl
+        exclude:
+          - kernel_version: 5.4.17
+            libc: static
+          - kernel_version: 5.4.17
+            libc: musl
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+          lfs: true
+      - name: Checkout LFS objects
+        run: git lfs checkout    
+      - name: Run build.sh
+        run: |
+          if [ ${{ matrix.kernel_version }} = "5.14.0" ]; then
+            os=centos9
+          elif [ ${{ matrix.kernel_version }} = "5.4.17" ]; then
+            os=oracle8
+          elif [ ${{ matrix.kernel_version }} = "4.18.0" ]; then
+            os=centos8
+          else
+            os=generic
+          fi
+          ./build.sh ${{ matrix.kernel_version }} ${{ matrix.libc }} "${os}"
+      - name: List Artifacts
+        run: |
+          ls -lah artifacts
+          test -f artifacts/khulnasoft_ebpf-*.tar.xz
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: artifacts-${{ matrix.kernel_version }}-${{ matrix.libc }}
+          path: artifacts
+
+  create-release:
+    name: Create Release
+    needs: build-artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+          lfs: true
+      - name: Checkout LFS objects
+        run: git lfs checkout    
+      - name: Download all Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: artifacts-*
+          path: artifacts
+          merge-multiple: true
+      - name: Set release_tag
+        run: |
+          echo "RELEASE_TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
+      - name: Consolidate Artifacts
+        run: |
+          mkdir -p final-artifacts
+          for libc in static glibc musl; do
+            for pkg in artifacts/khulnasoft_ebpf-*_*-${libc}.tar.xz; do
+              mkdir -p "packages/khulnasoft-kernel-collector-${libc}-${RELEASE_TAG}"
+              tar -C "packages/khulnasoft-kernel-collector-${libc}-${RELEASE_TAG}" -xvf "${pkg}"
+            done
+            if [ "${libc}" == "glibc" ]; then cp -R CentOS7/* "packages/khulnasoft-kernel-collector-${libc}-${RELEASE_TAG}"; fi
+            tar -C "packages/khulnasoft-kernel-collector-${libc}-${RELEASE_TAG}" -Jcvf "final-artifacts/khulnasoft-kernel-collector-${libc}-${RELEASE_TAG}.tar.xz" ./
+          done
+          cd final-artifacts && sha256sum ./*.tar.xz > sha256sums.txt
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: false
+          artifactErrorsFailBuild: true
+          artifacts: 'final-artifacts/*'
+          draft: true
+          token: ${{ secrets.KHULNASOFTBOT_GITHUB_TOKEN }}
