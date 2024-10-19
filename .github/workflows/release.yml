@@ -108,4 +108,4 @@ jobs:
           artifactErrorsFailBuild: true
           artifacts: 'final-artifacts/*'
           draft: true
-          token: ${{ secrets.KHULNASOFTBOT_GITHUB_TOKEN }}
+          token: ${{ secrets.ORG_REPO_TOKEN }}
