@@ -1,7 +1,7 @@
 # kernel-collector
 
-![CI](https://github.com/khulnasoft/kernel-collector/workflows/CI/badge.svg)
-![CD](https://github.com/khulnasoft/kernel-collector/workflows/CD/badge.svg)
+![CI](https://github.com/khulnasoft-lab/kernel-collector/workflows/CI/badge.svg)
+![CD](https://github.com/khulnasoft-lab/kernel-collector/workflows/CD/badge.svg)
 
 Linux Kernel eBPF Collectors
 
@@ -22,7 +22,7 @@ The respository has the following directory structure:
 - `kernel-patches`: contains patches needed to properly compile our legacy
   `kernel/` eBPF programs on some kernel versions.
 - `libbpf`: this is a submodule'd fork of
-  [khulnasoft/libbpf](https://github.com/khulnasoft/libbpf) which is itself a fork of
+  [khulnasoft/libbpf](https://github.com/khulnasoft-lab/libbpf) which is itself a fork of
   the official `libbpf` package, the user-space side of eBPF system calls.
 - `tools`: scripts used to verify system status before installing eBPF code.
 

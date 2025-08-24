@@ -9,9 +9,9 @@ all (`tester_user.c`).
 
 ## Libbpf
 
-This repo is currently using two libbpf versions. We are using the [latest](https://github.com/khulnasoft/libbpf) for kernels newer
+This repo is currently using two libbpf versions. We are using the [latest](https://github.com/khulnasoft-lab/libbpf) for kernels newer
 than `4.11`, and we still use version `0.0.9` to support `CentOS 7.9`. The transition between versions is done during compilation
-time using a [script](https://github.com/khulnasoft/kernel-collector/blob/master/.dockerfiles/change_libbpf.sh).
+time using a [script](https://github.com/khulnasoft-lab/kernel-collector/blob/master/.dockerfiles/change_libbpf.sh).
 
 ## Internal Code division
 
@@ -40,7 +40,7 @@ make prepare -C /usr/src/linux
 make headers_install -C /usr/src/linux
 ```
 
-You can take a look in our [docker image](https://github.com/khulnasoft/kernel-collector/blob/master/Dockerfile.glibc.generic) how
+You can take a look in our [docker image](https://github.com/khulnasoft-lab/kernel-collector/blob/master/Dockerfile.glibc.generic) how
 to get specific kernels from [kernel.org](https://kernel.org/).
 
 Our headers always start with prefix `khulnasoft_` and we append the associated `eBPF` code after `_`, the exceptions for this rule
@@ -78,12 +78,12 @@ monitors not only the calls, but also returns from functions.
 - tracepoints: provides a [hook](https://docs.kernel.org/trace/tracepoints.html) to call functions.
 
 There are other tracers like `uprobe` that we are not working right now, and `trampolines` that we have a specific 
-[repo](https://github.com/khulnasoft/ebpf-co-re) for them.
+[repo](https://github.com/khulnasoft-lab/ebpf-co-re) for them.
 
 ## Binaries
 
 Binaries are compiled in accordance to kernel version, the list of binaries are defined in our 
-[Makefile](https://github.com/khulnasoft/kernel-collector/blob/84e70d0ae83cc91fee59053459eff84f9077d2c5/kernel/Makefile#L66-L88).
+[Makefile](https://github.com/khulnasoft-lab/kernel-collector/blob/84e70d0ae83cc91fee59053459eff84f9077d2c5/kernel/Makefile#L66-L88).
 
 When needed to compile everything during development, we can run the command:
 

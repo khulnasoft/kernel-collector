@@ -1,4 +1,4 @@
 [submodule "libbpf"]
     path = libbpf
-    url = https://github.com/khulnasoft/libbpf
+    url = https://github.com/khulnasoft-lab/libbpf
     ignore = dirty
